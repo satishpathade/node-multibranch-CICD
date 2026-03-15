@@ -32,15 +32,13 @@ pipeline {
             steps {
                 sshagent(credentials: ["${SSH_CRED}"]) {
                     sh '''
-                    ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${SERVER_IP} '
-                        cd /home/ubuntu/nodeapp
-
+                    ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${SERVER_IP} "
+                        cd ${APP_DIR}
                         npm install
-
-                        pm2 delete node-app || true
-                        pm2 start src/server.js --name node-app
+                        pm2 delete ${APP_NAME} || true
+                        pm2 start src/server.js --name ${APP_NAME}
                         pm2 save
-                    '
+                    "
                     '''
                 }
             }
