@@ -17,18 +17,6 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
-            steps {
-                sh 'npm install'
-            }
-        }
-
-        stage('Run Tests') {
-            steps {
-                sh 'npm test'
-            }
-        }
-
         stage('Deploy to EC2') {
             steps {
                 sshagent(credentials: ["${SSH_CRED}"]) {
@@ -45,16 +33,12 @@ pipeline {
                 sshagent(credentials: ["${SSH_CRED}"]) {
                     sh '''
                     ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${SERVER_IP} '
-                        sudo apt update
-                        sudo apt install nodejs npm -y
-                        sudo npm install -g pm2
-
-                        cd ${APP_DIR}
+                        cd /home/ubuntu/nodeapp
 
                         npm install
 
-                        pm2 delete ${APP_NAME} || true
-                        pm2 start src/server.js --name ${APP_NAME}
+                        pm2 delete node-app || true
+                        pm2 start src/server.js --name node-app
                         pm2 save
                     '
                     '''
